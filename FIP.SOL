@@ -76,17 +76,6 @@ library SafeMath {
   }
 }
 
-// This is an ERC-20 token contract based .
-//
-// We had to copy over the code instead of inheriting because of changes
-// to the modifier lists of some functions:
-//   * transfer(), transferFrom() and approve() are not callable during
-//     the minting period, only after MintingFinished()
-//   * mint() can only be called by the minter who is not the owner
-//     but the HoloTokenSale contract.
-//
-// Token can be burned by a special 'destroyer' role that can only
-// burn its tokens.
 contract FIP is Ownable {
   string public constant name = "FIP";
   string public constant symbol = "FIP";
@@ -111,30 +100,14 @@ contract FIP is Ownable {
 
   mapping(address => uint256) public balances;
   
-   /**
-     * 私有方法从一个帐户发送给另一个帐户代币
-     * @param  _from address 发送代币的地址
-     * @param  _to address 接受代币的地址
-     * @param  _value uint256 接受代币的数量
-     */
+ 
   function _transfer(address _from, address _to, uint256 _value) internal {
-    
-      //避免转帐的地址是0x0
+   
       require(_to != address(0));
-    
-      //检查发送者是否拥有足够余额
       require(balances[_from] >= _value);
-    
-      //检查是否溢出
       require(balances[_to].add(_value) > balances[_to]);
-    
-      //从发送者减掉发送额
       balances[_from] = balances[_from].sub(_value);
-      
-      //给接收者加上相同的量
       balances[_to] = balances[_to].add(_value);
-    
-      //通知任何监听该交易的客户端
       emit Transfer(_from, _to, _value);
   }
  
@@ -158,14 +131,6 @@ contract FIP is Ownable {
     return balances[_owner];
   }
 
-/*  function totalSupply() public view returns (uint256 supply) {
-    return totalSupply;
-  }
-*/
-
-  //=====================================================================================
-  // Zeppelin StandardToken (plus modifier to not allow transfers during minting period):
-  //=====================================================================================
   mapping (address => mapping (address => uint256)) public allowed;
 
 
